@@ -68,6 +68,8 @@ while True:
             elif cmd == 'q':
                 print('See you next time!')
                 exit()
+            if new_room: 
+                player.current_room = new_room
             else:
                 print('Cannot go this way ...')
         else: 
