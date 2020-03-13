@@ -1,6 +1,6 @@
 from room import Room
 from player import Player
-import textwrap
+from item import Item
 
 # Declare all the rooms
 
@@ -24,6 +24,14 @@ earlier adventurers. The only exit is to the south."""),
 }
 
 
+# Add Items to room
+
+room['outside'].items = [Item('torch', 'torch that magically illuminates the area')]
+room['foyer'].items = [Item('boots', 'old leather boots')]
+
+
+
+
 # Link rooms together
 
 room['outside'].n_to = room['foyer']
@@ -35,45 +43,78 @@ room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
 
+
 #
 # Main
 #
 
 # Make a new player object that is currently in the 'outside' room.
-player_name = input('Enter player name: ')
-player = Player('player_name', room['outside'])
-print(f'New Adventure begins, {player.name}!')
+player = Player(input('Enter Player Name: '), room['outside'])
+print(player.current_room)
+
+
+valid_directions = ('n', 's', 'e', 'w')
+
+
+while True: 
+    cmd = input('\nAvailable commands: Move [n], [s], [e], [w], [q] exit game, [take] to pick up item, or [drop][item_name]\n')
+    for item in player.current_room.items:
+        print(f'\n\nItems in current room: {item.name}\n\n')
+
+    if cmd == 'q':
+        print('See you next time!')
+        exit(0)
+    elif cmd in valid_directions:
+        player.travel(cmd)
+    else: 
+        print('I did not understand that command')
+    
+    if len(cmd) > 2:
+        if cmd == 'take':
+            for item in player.current_room.items:
+                # player.current_room.items.remove(item)
+                # player.items.append(item)
+                # Item.on_take(item)
+                player.add_items(item)
+                print(f'\n\n{player.name} picked up {item.name}\n\n')
+        elif cmd == 'drop':
+            player.drop_items(item)
+        elif cmd == 'view':
+            player.current_inventory()
+        else:
+            print("Would you like to [take] item, [drop] item, or [view] current inventory")
+
+
+
+
 
 # Write a loop that:
-while True: 
 # * Prints the current room name
-    print(player.current_room.name)
 # * Prints the current description (the textwrap module might be useful here).
-    print(player.current_room.description)
 # * Waits for user input and decides what to do.
-    cmd = input('Choose a direction to move character: [n] North [s] South [e] East [w] West or [q] to exit game.')
-    print(f'Going {cmd}!')
+    # cmd = input('Choose a direction to move character: [n] North [s] South [e] East [w] West or [q] to exit game.')
+    # print(f'Going {cmd}!')
 # If the user enters a cardinal direction, attempt to move to the room there.
-    if len(cmd) == 1: 
-        new_room = None
-        if cmd in ['n', 's', 'e', 'w', 'q']:
-            if cmd == 'n':
-                new_room = player.current_room.n_to
-            elif cmd == 's':
-                new_room = player.current_room.s_to
-            elif cmd == 'e':
-                new_room = player.current_room.e_to
-            elif cmd == 'w':
-                new_room = player.current_room.w_to
-            elif cmd == 'q':
-                print('See you next time!')
-                exit()
-            if new_room: 
-                player.current_room = new_room
-            else:
-                print('Cannot go this way ...')
-        else: 
-            print('ERROR: Invalid input')
+    # if len(cmd) == 1: 
+    #     new_room = None
+    #     if cmd in ('n', 's', 'e', 'w', 'q'):
+    #         if cmd == 'n':
+    #             new_room = player.current_room.n_to
+    #         elif cmd == 's':
+    #             new_room = player.current_room.s_to
+    #         elif cmd == 'e':
+    #             new_room = player.current_room.e_to
+    #         elif cmd == 'w':
+    #             new_room = player.current_room.w_to
+    #         elif cmd == 'q':
+    #             print('See you next time!')
+    #             exit()
+    #         if new_room: 
+    #             player.current_room = new_room
+    #         else:
+    #             print('Cannot go this way ...')
+    #     else: 
+    #         print('ERROR: Invalid input')
 
 # Print an error message if the movement isn't allowed.
 #
